@@ -1,0 +1,83 @@
+{% extends "base/_layout.html" %}
+{% block title %}{{ customer.name }} | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">{{ customer.name|first|upper }}</div>
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">{{ customer.name }}</h1>
+            <p class="text-slate-500 text-sm mt-1">{{ customer.phone }}{% if customer.address %} · {{ customer.address }}{% endif %}</p>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <a href="{% url 'customer_edit' customer.pk %}" class="text-sm font-semibold text-slate-600 bg-slate-100 px-4 py-2.5 rounded-xl">Tahrirlash</a>
+        <a href="{% url 'payment_create' %}" class="text-sm font-semibold text-white bg-emerald-600 px-4 py-2.5 rounded-xl">+ To'lov qabul qilish</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-sm text-slate-500 font-medium">Jami qarz</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ customer.total_debt|floatformat:0 }} so'm</h3>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-sm text-slate-500 font-medium">To'langan</p>
+        <h3 class="text-xl font-extrabold text-emerald-600 mt-1">{{ customer.total_paid|floatformat:0 }} so'm</h3>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-sm text-slate-500 font-medium">Qoldiq qarz</p>
+        <h3 class="text-xl font-extrabold {% if customer.remaining_debt > 0 %}text-rose-600{% else %}text-emerald-600{% endif %} mt-1">{{ customer.remaining_debt|floatformat:0 }} so'm</h3>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm">
+        <div class="flex items-center justify-between p-5 border-b border-slate-100">
+            <h3 class="font-bold text-slate-800">Qarzlar tarixi</h3>
+            <a href="{% url 'debt_create' %}" class="text-xs font-semibold text-indigo-600">+ Yangi qarz</a>
+        </div>
+        <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+            {% for debt in debts %}
+            <div class="p-4 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">{{ debt.description|default:"Qarz" }}</p>
+                    <p class="text-xs text-slate-400">{% if debt.store %}{{ debt.store.icon }} {{ debt.store.name }} · {% endif %}{{ debt.debt_date }} · Muddat: {{ debt.due_date }}</p>
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-sm font-bold text-slate-800">{{ debt.amount|floatformat:0 }} so'm</p>
+                    {% if debt.status == "paid" %}
+                        <span class="text-xs font-semibold text-emerald-600">To'langan</span>
+                    {% elif debt.status == "overdue" %}
+                        <span class="text-xs font-semibold text-rose-600">Muddati o'tgan</span>
+                    {% else %}
+                        <span class="text-xs font-semibold text-orange-600">Faol</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-sm text-slate-400 p-5">Qarzlar mavjud emas.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm">
+        <div class="flex items-center justify-between p-5 border-b border-slate-100">
+            <h3 class="font-bold text-slate-800">To'lovlar tarixi</h3>
+        </div>
+        <div class="divide-y divide-slate-100 max-h-96 overflow-y-auto">
+            {% for payment in payments %}
+            <div class="p-4 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">{{ payment.get_payment_type_display }}</p>
+                    <p class="text-xs text-slate-400 truncate">{{ payment.payment_date }}{% if payment.description %} · {{ payment.description }}{% endif %}</p>
+                </div>
+                <p class="text-sm font-bold text-emerald-600 shrink-0">+{{ payment.amount|floatformat:0 }} so'm</p>
+            </div>
+            {% empty %}
+            <p class="text-sm text-slate-400 p-5">To'lovlar mavjud emas.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

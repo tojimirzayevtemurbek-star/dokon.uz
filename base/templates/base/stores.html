@@ -1,0 +1,37 @@
+{% extends "base/_layout.html" %}
+{% block title %}Do'konlar | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Do'konlar</h1>
+        <p class="text-slate-500 text-sm mt-1">Qarzlarni yo'nalishlar bo'yicha guruhlang</p>
+    </div>
+    {% if request.user.is_superuser %}
+    <a href="{% url 'store_create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm">+ Do'kon qo'shish</a>
+    {% endif %}
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm divide-y divide-slate-100">
+    {% for store in stores %}
+    <div class="flex items-center justify-between gap-4 p-5">
+        <div class="flex items-center gap-4 min-w-0">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-xl shrink-0">{{ store.icon }}</div>
+            <div class="min-w-0">
+                <p class="font-bold text-slate-800 truncate">{{ store.name }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ store.category|default:"Yo'nalish ko'rsatilmagan" }}</p>
+            </div>
+        </div>
+        <div class="text-right shrink-0">
+            <p class="text-sm font-bold text-slate-800">{{ store.total_remaining|floatformat:0 }} so'm</p>
+            <p class="text-xs text-slate-400">{{ store.debt_count }} ta qarz</p>
+        </div>
+        {% if request.user.is_superuser %}
+        <a href="{% url 'store_delete' store.pk %}" class="text-rose-500 text-xs font-semibold shrink-0">O'chirish</a>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-sm text-slate-400 p-8 text-center">Hozircha do'kon qo'shilmagan. Yuqoridagi tugma orqali birinchi do'koningizni qo'shing.</p>
+    {% endfor %}
+</div>
+{% endblock %}

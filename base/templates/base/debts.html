@@ -1,0 +1,67 @@
+{% extends "base/_layout.html" %}
+{% block title %}Qarzlar ro'yxati | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Qarzlar ro'yxati</h1>
+        <p class="text-slate-500 text-sm mt-1">Barcha berilgan qarzlar va ularning holati</p>
+    </div>
+    <a href="{% url 'debt_create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm">+ Yangi qarz</a>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm">
+    <form class="flex flex-wrap items-center gap-3 p-5 border-b border-slate-100">
+        <input type="text" name="search" value="{{ search }}" placeholder="Mijoz, telefon yoki mahsulot bo'yicha qidirish..." class="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+        <select name="status" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-sm outline-none">
+            <option value="" {% if not status %}selected{% endif %}>Barchasi</option>
+            <option value="active" {% if status == "active" %}selected{% endif %}>Faol</option>
+            <option value="overdue" {% if status == "overdue" %}selected{% endif %}>Muddati o'tgan</option>
+            <option value="paid" {% if status == "paid" %}selected{% endif %}>To'langan</option>
+        </select>
+        <button class="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold">Qidirish</button>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-slate-400 text-xs uppercase tracking-wide">
+                    <th class="px-5 py-3 font-semibold">#</th>
+                    <th class="px-5 py-3 font-semibold">Mijoz</th>
+                    <th class="px-5 py-3 font-semibold">Do'kon</th>
+                    <th class="px-5 py-3 font-semibold">Miqdor</th>
+                    <th class="px-5 py-3 font-semibold">Qoldiq</th>
+                    <th class="px-5 py-3 font-semibold">Holat</th>
+                    <th class="px-5 py-3 font-semibold">Sana</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for debt in debts %}
+                <tr class="hover:bg-slate-50/60">
+                    <td class="px-5 py-4 text-slate-400">{{ forloop.counter }}</td>
+                    <td class="px-5 py-4">
+                        <a href="{% url 'customer_detail' debt.customer.pk %}" class="font-semibold text-slate-800 hover:text-indigo-600">{{ debt.customer.name }}</a>
+                        <p class="text-xs text-slate-400">{{ debt.customer.phone }}</p>
+                    </td>
+                    <td class="px-5 py-4 text-slate-600">{% if debt.store %}{{ debt.store.icon }} {{ debt.store.name }}{% else %}—{% endif %}</td>
+                    <td class="px-5 py-4 font-medium text-slate-700">{{ debt.amount|floatformat:0 }} so'm</td>
+                    <td class="px-5 py-4 font-bold {% if debt.remaining > 0 %}text-rose-600{% else %}text-emerald-600{% endif %}">{{ debt.remaining|floatformat:0 }} so'm</td>
+                    <td class="px-5 py-4">
+                        {% if debt.status == "paid" %}
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">To'langan</span>
+                        {% elif debt.status == "overdue" %}
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-600">Muddati o'tgan</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-600">Faol</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4 text-slate-500 whitespace-nowrap">{{ debt.debt_date }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="px-5 py-10 text-center text-slate-400">Hech qanday qarz topilmadi.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

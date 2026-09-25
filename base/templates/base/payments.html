@@ -1,0 +1,48 @@
+{% extends "base/_layout.html" %}
+{% block title %}To'lovlar | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">To'lovlar</h1>
+        <p class="text-slate-500 text-sm mt-1">Qabul qilingan barcha to'lovlar tarixi</p>
+    </div>
+    <a href="{% url 'payment_create' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm">+ To'lov qabul qilish</a>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm">
+    <form class="flex flex-wrap items-center gap-3 p-5 border-b border-slate-100">
+        <input type="text" name="search" value="{{ search }}" placeholder="Mijoz yoki telefon bo'yicha qidirish..." class="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+        <button class="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold">Qidirish</button>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-slate-400 text-xs uppercase tracking-wide">
+                    <th class="px-5 py-3 font-semibold">Mijoz</th>
+                    <th class="px-5 py-3 font-semibold">Summasi</th>
+                    <th class="px-5 py-3 font-semibold">Turi</th>
+                    <th class="px-5 py-3 font-semibold">Izoh</th>
+                    <th class="px-5 py-3 font-semibold">Sana</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for payment in payments %}
+                <tr class="hover:bg-slate-50/60">
+                    <td class="px-5 py-4">
+                        <a href="{% url 'customer_detail' payment.customer.pk %}" class="font-semibold text-slate-800 hover:text-indigo-600">{{ payment.customer.name }}</a>
+                    </td>
+                    <td class="px-5 py-4 font-bold text-emerald-600">+{{ payment.amount|floatformat:0 }} so'm</td>
+                    <td class="px-5 py-4 text-slate-600">{{ payment.get_payment_type_display }}</td>
+                    <td class="px-5 py-4 text-slate-500">{{ payment.description|default:"—" }}</td>
+                    <td class="px-5 py-4 text-slate-500 whitespace-nowrap">{{ payment.payment_date }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="px-5 py-10 text-center text-slate-400">Hech qanday to'lov topilmadi.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

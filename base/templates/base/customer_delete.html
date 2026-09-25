@@ -1,0 +1,17 @@
+{% extends "base/_layout.html" %}
+{% block title %}Mijozni o'chirish | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-8 max-w-lg mx-auto text-center">
+    <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg></div>
+    <h1 class="text-xl font-extrabold text-slate-900">Mijozni o'chirmoqchimisiz?</h1>
+    <p class="text-slate-500 text-sm mt-2">
+        <span class="font-semibold text-slate-700">{{ customer.name }}</span> mijozi va unga tegishli barcha qarz va to'lovlar butunlay o'chib ketadi. Bu amalni ortga qaytarib bo'lmaydi.
+    </p>
+    <form method="POST" class="flex items-center justify-center gap-3 mt-6">
+        {% csrf_token %}
+        <button class="bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl">Ha, o'chirish</button>
+        <a href="{% url 'customer_detail' customer.pk %}" class="text-sm font-semibold text-slate-500 px-5 py-2.5 bg-slate-100 rounded-xl">Bekor qilish</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base/_layout.html" %}
+{% block title %}Profil | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center gap-4">
+    <div class="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shrink-0">
+        {{ request.user.username|first|upper }}
+    </div>
+    <div class="min-w-0">
+        <h1 class="text-2xl font-extrabold text-slate-900 truncate">{{ request.user.username }}</h1>
+        <p class="text-slate-500 text-sm mt-1">
+            {% if request.user.is_superuser %}Administrator{% else %}Foydalanuvchi{% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-xs text-slate-500 font-medium">Mijozlar</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ total_customers }}</h3>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-xs text-slate-500 font-medium">Do'konlar</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ total_stores }}</h3>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-xs text-slate-500 font-medium">Jami qarz</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ total_debt|floatformat:0 }} so'm</h3>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <p class="text-xs text-slate-500 font-medium">Qoldiq qarz</p>
+        <h3 class="text-xl font-extrabold {% if remaining_debt > 0 %}text-rose-600{% else %}text-emerald-600{% endif %} mt-1">{{ remaining_debt|floatformat:0 }} so'm</h3>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm divide-y divide-slate-100">
+    <div class="p-5 flex items-center justify-between gap-3">
+        <div>
+            <p class="text-sm font-semibold text-slate-800">Login</p>
+            <p class="text-xs text-slate-400 mt-0.5">Tizimga kirish uchun foydalanuvchi nomi</p>
+        </div>
+        <p class="text-sm font-bold text-slate-800">{{ request.user.username }}</p>
+    </div>
+    <div class="p-5 flex items-center justify-between gap-3">
+        <div>
+            <p class="text-sm font-semibold text-slate-800">Rol</p>
+            <p class="text-xs text-slate-400 mt-0.5">Tizimdagi huquqlar darajasi</p>
+        </div>
+        <p class="text-sm font-bold text-slate-800">
+            {% if request.user.is_superuser %}Administrator{% else %}Oddiy foydalanuvchi{% endif %}
+        </p>
+    </div>
+    <div class="p-5 flex items-center justify-between gap-3">
+        <div>
+            <p class="text-sm font-semibold text-slate-800">Ro'yxatdan o'tgan sana</p>
+            <p class="text-xs text-slate-400 mt-0.5">Hisob yaratilgan kun</p>
+        </div>
+        <p class="text-sm font-bold text-slate-800">{{ request.user.date_joined|date:"d.m.Y" }}</p>
+    </div>
+</div>
+
+<div>
+    <a href="{% url 'logout' %}" class="inline-flex items-center gap-2 text-sm font-semibold text-rose-600 bg-rose-50 px-4 py-2.5 rounded-xl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px]"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        Tizimdan chiqish
+    </a>
+</div>
+{% endblock %}

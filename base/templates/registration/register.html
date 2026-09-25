@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ro'yxatdan o'tish | Do'kon Qarzdorlik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="min-h-screen bg-[#0B1330]">
+<div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+
+    <div class="hidden lg:flex flex-col justify-center px-16 text-white relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-72 h-72 bg-indigo-600/30 rounded-full blur-3xl"></div>
+        <div class="relative">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M2 7h20l-1.6 5.6a2 2 0 0 1-2 1.4H5.6a2 2 0 0 1-2-1.4Z"/><path d="M4 7V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3"/><path d="M5 14v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/><path d="M10 21v-5a2 2 0 0 1 2-2v0a2 2 0 0 1 2 2v5"/></svg></div>
+            <h1 class="text-4xl font-extrabold leading-tight">Do'kon<br>Qarzdorlik</h1>
+            <p class="text-indigo-200 mt-4 max-w-sm">Bir necha daqiqada hisob oching va do'koningiz qarzdorligini boshqarishni boshlang.</p>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-center p-6 sm:p-10 bg-[#F3F5F9]">
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-8 lg:hidden">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600 text-white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M2 7h20l-1.6 5.6a2 2 0 0 1-2 1.4H5.6a2 2 0 0 1-2-1.4Z"/><path d="M4 7V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3"/><path d="M5 14v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/><path d="M10 21v-5a2 2 0 0 1 2-2v0a2 2 0 0 1 2 2v5"/></svg></div>
+                <h1 class="text-2xl font-extrabold text-slate-900 mt-4">Do'kon Qarzdorlik</h1>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 shadow-xl">
+                <h2 class="text-xl font-extrabold text-slate-900">Ro'yxatdan o'tish</h2>
+                <p class="text-slate-500 text-sm mt-1 mb-6">Yangi hisob yarating</p>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">{{ field.label }}</label>
+                        <div class="[&_input]:w-full [&_input]:px-4 [&_input]:py-2.5 [&_input]:rounded-xl [&_input]:border [&_input]:border-slate-200 [&_input]:bg-slate-50/60 [&_input]:text-sm [&_input]:outline-none">
+                            {{ field }}
+                        </div>
+                        {% if field.help_text %}
+                            <p class="text-[11px] text-slate-400 mt-1">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="text-xs text-rose-600 mt-1">{{ field.errors|striptags }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-3 rounded-xl mt-2">Ro'yxatdan o'tish</button>
+                </form>
+
+                <p class="text-center text-sm text-slate-500 mt-5">
+                    Hisobingiz bormi?
+                    <a href="{% url 'login' %}" class="text-indigo-600 font-semibold">Kirish</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

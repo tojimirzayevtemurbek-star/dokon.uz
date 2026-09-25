@@ -1,0 +1,70 @@
+{% extends "base/_layout.html" %}
+{% block title %}Mijozlar | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Mijozlar</h1>
+        <p class="text-slate-500 text-sm mt-1">Barcha mijozlaringiz ro'yxati va qarzdorlik holati</p>
+    </div>
+    <a href="{% url 'customer_create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm">+ Yangi mijoz</a>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm">
+    <form class="flex flex-wrap items-center gap-3 p-5 border-b border-slate-100">
+        <input type="text" name="search" value="{{ search }}" placeholder="Ism yoki telefon bo'yicha qidirish..." class="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+        <select name="status" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-sm outline-none">
+            <option value="" {% if not status %}selected{% endif %}>Barchasi</option>
+            <option value="debtors" {% if status == "debtors" %}selected{% endif %}>Qarzdorlar</option>
+            <option value="paid" {% if status == "paid" %}selected{% endif %}>To'langanlar</option>
+        </select>
+        <button class="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-sm font-semibold">Qidirish</button>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-left text-slate-400 text-xs uppercase tracking-wide">
+                    <th class="px-5 py-3 font-semibold">Mijoz</th>
+                    <th class="px-5 py-3 font-semibold">Telefon</th>
+                    <th class="px-5 py-3 font-semibold">Jami qarz</th>
+                    <th class="px-5 py-3 font-semibold">Qoldiq</th>
+                    <th class="px-5 py-3 font-semibold">Holat</th>
+                    <th class="px-5 py-3 font-semibold text-right">Amallar</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for customer in customers %}
+                <tr class="hover:bg-slate-50/60">
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs">{{ customer.name|first|upper }}</div>
+                            <span class="font-semibold text-slate-800">{{ customer.name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 text-slate-500">{{ customer.phone }}</td>
+                    <td class="px-5 py-4 font-medium text-slate-700">{{ customer.total_debt|floatformat:0 }} so'm</td>
+                    <td class="px-5 py-4 font-bold {% if customer.remaining_debt > 0 %}text-rose-600{% else %}text-emerald-600{% endif %}">{{ customer.remaining_debt|floatformat:0 }} so'm</td>
+                    <td class="px-5 py-4">
+                        {% if customer.remaining_debt <= 0 %}
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600">To'langan</span>
+                        {% elif customer.has_overdue %}
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-600">Muddati o'tgan</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-600">Qarzdor</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-4 text-right space-x-3 whitespace-nowrap">
+                        <a href="{% url 'customer_detail' customer.pk %}" class="text-indigo-600 font-semibold text-xs">Ko'rish</a>
+                        <a href="{% url 'customer_edit' customer.pk %}" class="text-slate-500 font-semibold text-xs">Tahrirlash</a>
+                        <a href="{% url 'customer_delete' customer.pk %}" class="text-rose-500 font-semibold text-xs">O'chirish</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-5 py-10 text-center text-slate-400">Hech qanday mijoz topilmadi.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

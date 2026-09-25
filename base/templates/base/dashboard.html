@@ -1,0 +1,142 @@
+{% extends "base/_layout.html" %}
+{% block title %}Bosh sahifa | Do'kon Qarzdorlik{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-2xl font-extrabold text-slate-900">Bosh sahifa</h1>
+    <p class="text-slate-500 text-sm mt-1">Do'konlar qarzdorlik tizimingizga xush kelibsiz!</p>
+</div>
+
+<!-- KPI cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-blue-500 text-white flex items-center justify-center mb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div>
+        <p class="text-sm text-slate-500 font-medium">Jami qarzlar</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ total_debt|floatformat:0 }} so'm</h3>
+        <span class="text-xs text-emerald-600 font-semibold">Real vaqt hisobi</span>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-emerald-500 text-white flex items-center justify-center mb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <p class="text-sm text-slate-500 font-medium">Qarzdor mijozlar</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ debtor_count }} ta</h3>
+        <span class="text-xs text-emerald-600 font-semibold">{{ total_customers }} tadan</span>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-orange-500 text-white flex items-center justify-center mb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg></div>
+        <p class="text-sm text-slate-500 font-medium">To'lovlar (bugun)</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ today_payments|floatformat:0 }} so'm</h3>
+        <span class="text-xs text-emerald-600 font-semibold">Jami: {{ total_paid|floatformat:0 }} so'm</span>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-5 shadow-sm">
+        <div class="w-11 h-11 rounded-xl bg-violet-500 text-white flex items-center justify-center mb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg></div>
+        <p class="text-sm text-slate-500 font-medium">Do'konlar soni</p>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">{{ store_count }} ta</h3>
+        <span class="text-xs {% if overdue_count %}text-rose-600{% else %}text-emerald-600{% endif %} font-semibold">
+            {% if overdue_count %}{{ overdue_count }} ta muddati o'tgan{% else %}Muddati o'tgan yo'q{% endif %}
+        </span>
+    </div>
+</div>
+
+<!-- Chart + Top debtors -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/70 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Qarzlar dinamikasi</h3>
+            <span class="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">7 kun</span>
+        </div>
+        <canvas id="debtChart" height="130"></canvas>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">Eng ko'p qarzdor mijozlar</h3>
+            <a href="{% url 'customer_list' %}?status=debtors" class="text-xs font-medium text-indigo-600">Barchasi</a>
+        </div>
+        <div class="space-y-4">
+            {% for customer in top_debtors %}
+            <a href="{% url 'customer_detail' customer.pk %}" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500 shrink-0">{{ forloop.counter }}</div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-800 truncate group-hover:text-indigo-600">{{ customer.name }}</p>
+                    <p class="text-xs text-slate-400">{{ customer.debts.count }} ta qarz</p>
+                </div>
+                <p class="text-sm font-bold text-rose-600 whitespace-nowrap">{{ customer.remaining_debt|floatformat:0 }}</p>
+            </a>
+            {% empty %}
+            <p class="text-sm text-slate-400">Hozircha qarzdor mijozlar yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Recent activity -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">So'nggi qo'shilgan qarzlar</h3>
+            <a href="{% url 'debt_create' %}" class="text-xs font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg">+ Yangi qarz</a>
+        </div>
+        <div class="divide-y divide-slate-100">
+            {% for debt in recent_debts %}
+            <div class="py-3 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">{{ debt.customer.name }}</p>
+                    <p class="text-xs text-slate-400 truncate">{% if debt.store %}{{ debt.store.icon }} {{ debt.store.name }} · {% endif %}{{ debt.debt_date }}</p>
+                </div>
+                <span class="text-sm font-bold text-slate-800 whitespace-nowrap">{{ debt.amount|floatformat:0 }} so'm</span>
+            </div>
+            {% empty %}
+            <p class="text-sm text-slate-400 py-3">Hozircha qarzlar yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800">So'nggi to'lovlar</h3>
+            <a href="{% url 'payment_create' %}" class="text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg">+ To'lov qabul qilish</a>
+        </div>
+        <div class="divide-y divide-slate-100">
+            {% for payment in recent_payments %}
+            <div class="py-3 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">{{ payment.customer.name }}</p>
+                    <p class="text-xs text-slate-400 truncate">{{ payment.get_payment_type_display }} · {{ payment.payment_date }}</p>
+                </div>
+                <span class="text-sm font-bold text-emerald-600 whitespace-nowrap">+{{ payment.amount|floatformat:0 }} so'm</span>
+            </div>
+            {% empty %}
+            <p class="text-sm text-slate-400 py-3">Hozircha to'lovlar yo'q.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+    const ctx = document.getElementById('debtChart');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: "Qarz (so'm)",
+                data: {{ chart_values|safe }},
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79,70,229,0.08)',
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#4f46e5',
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}
